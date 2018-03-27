@@ -16,6 +16,10 @@ namespace Otrs2Alfresco
         private const string TicketPrefixTag = "TicketPrefix";
         private const string TicketNumberRegexTag = "TicketNumberRegex";
         private const string TicketNumberFormatTag = "TicketNumberFormat";
+        private const string AdminMailAddressTag = "AdminMailAddress";
+        private const string MailServerHostTag = "MailServerHost";
+        private const string MailServerPortTag = "MailServerPort";
+        private const string SystemMailAddressTag = "SystemMailAddress";
 
         public string AlfrescoBaseUrl { get; private set; }
 
@@ -37,6 +41,14 @@ namespace Otrs2Alfresco
 
         public string TicketNumberFormat { get; private set; }
 
+        public string AdminMailAddress { get; private set; }
+
+        public string MailServerHost { get; private set; }
+
+        public int MailServerPort { get; private set; }
+
+        public string SystemMailAddress { get; private set; }
+
         public Config()
         {
             AlfrescoBaseUrl = string.Empty;
@@ -49,6 +61,10 @@ namespace Otrs2Alfresco
             TicketPrefix = string.Empty;
             TicketNumberRegex = string.Empty;
             TicketNumberFormat = string.Empty;
+            AdminMailAddress = string.Empty;
+            MailServerHost = string.Empty;
+            MailServerPort = 25;
+            SystemMailAddress = string.Empty;
         }
 
         public static Config Load(string filename)
@@ -67,6 +83,10 @@ namespace Otrs2Alfresco
             config.TicketPrefix = root.Element(TicketPrefixTag).Value;
             config.TicketNumberRegex = root.Element(TicketNumberRegexTag).Value;
             config.TicketNumberFormat = root.Element(TicketNumberFormatTag).Value;
+            config.AdminMailAddress = root.Element(AdminMailAddressTag).Value;
+            config.MailServerHost = root.Element(MailServerHostTag).Value;
+            config.MailServerPort = int.Parse(root.Element(MailServerPortTag).Value);
+            config.SystemMailAddress = root.Element(SystemMailAddressTag).Value;
 
             return config;
         }
@@ -87,6 +107,10 @@ namespace Otrs2Alfresco
             root.Add(new XElement(TicketPrefixTag, TicketPrefix));
             root.Add(new XElement(TicketNumberRegexTag, TicketNumberRegex));
             root.Add(new XElement(TicketNumberFormatTag, TicketNumberFormat));
+            root.Add(new XElement(AdminMailAddressTag, TicketNumberFormat));
+            root.Add(new XElement(MailServerHostTag, MailServerHost));
+            root.Add(new XElement(MailServerPortTag, MailServerPort.ToString()));
+            root.Add(new XElement(SystemMailAddressTag, SystemMailAddress));
 
             document.Save(filename);
         }

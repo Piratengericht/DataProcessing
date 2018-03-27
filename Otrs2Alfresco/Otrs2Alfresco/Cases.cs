@@ -13,6 +13,7 @@ namespace Otrs2Alfresco
     {
         private Logger _log;
         private Config _config;
+        private Mailer _mail;
         private AlfrescoClient _alfresco;
         private OtrsClient _otrs;
         private DateTime _lastUpdate;
@@ -63,12 +64,19 @@ namespace Otrs2Alfresco
         public void Connect()
         {
             _config = LoadConfig();
+            _mail = new Mailer(_log, _config);
 
             _otrs = new OtrsClient(_config.OtrsBaseUrl, _config.OtrsUsername, _config.OtrsPassword);
             _log.Info("OTRS URL is {0}", _config.OtrsBaseUrl);
 
             _alfresco = new AlfrescoClient(_config.AlfrescoBaseUrl, _config.AlfrescoUsername, _config.AlfrescoPassword);
             _log.Info("Alfresco URL is {0}", _config.AlfrescoBaseUrl);
+
+            if (_log.HighestSeverity >= LogSeverity.Notice)
+            {
+                _mail.SendWarning(_log.ToText(LogSeverity.Verbose));
+                _log.Clear();
+            }
         }
 
         private bool IsCase(Ticket ticket)
@@ -108,6 +116,12 @@ namespace Otrs2Alfresco
                 }
 
                 ticketCounter++;
+            }
+
+            if (_log.HighestSeverity >= LogSeverity.Notice)
+            {
+                _mail.SendWarning(_log.ToText(LogSeverity.Verbose));
+                _log.Clear();
             }
         }
 
@@ -157,6 +171,12 @@ namespace Otrs2Alfresco
                 }
 
                 ticketCounter++;
+            }
+
+            if (_log.HighestSeverity >= LogSeverity.Notice)
+            {
+                _mail.SendWarning(_log.ToText(LogSeverity.Verbose));
+                _log.Clear();
             }
         }
     }

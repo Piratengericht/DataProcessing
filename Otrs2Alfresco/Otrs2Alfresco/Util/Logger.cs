@@ -185,6 +185,11 @@ namespace Otrs2Alfresco
             return builder.ToString();
         }
 
+        public void Clear()
+        {
+            Entries.Clear();
+        }
+
         public LogSeverity HighestSeverity
         {
             get 
