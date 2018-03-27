@@ -27,13 +27,14 @@ namespace Otrs2Alfresco
 
         public override bool Handle(FileHandlerData data)
         {
-            Console.WriteLine("Extracting file " + data.FileName);
+            Context.Log.Info("Extracting file {0}", data.FileName);
 
             using (var zip = new Zip())
             {
                 if (!zip.Extract(data.Data))
                 {
-                    Console.WriteLine("Cannot extract file " + data.FileName);
+                    Context.Log.Error("Cannot extract file {0}", data.FileName);
+                    Context.Log.Error(zip.ErrorText);
                     return false;
                 }
 

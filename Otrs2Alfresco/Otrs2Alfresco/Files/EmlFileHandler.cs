@@ -35,7 +35,7 @@ namespace Otrs2Alfresco
         private void HandleMessage(MimeMessage message, string prefix)
         { 
             var name = prefix + " " + Helper.SanatizeName(message.Subject);
-            Console.WriteLine("Uploading file " + name);
+            Context.Log.Info("Uploading file {0}", name);
             var text = System.IO.File.ReadAllText("Templates/mail.tex");
             var latex = new Latex(text);
             latex.Add("MAILDATE", Helper.FormatDateTime(message.Date.Date));
@@ -53,9 +53,11 @@ namespace Otrs2Alfresco
             }
             else
             {
-                Console.WriteLine("Eml could not be texed " + name);
+                Context.Log.Error("Eml could not be texed {0}", name);
+                Context.Log.Error(latex.ErrorText);
                 Alfresco.CreateFile(Context.CaseFolder.Id, name + ".tex", Encoding.UTF8.GetBytes(latex.TexDocument));
-            }}
+            }
+        }
 
         public override bool Handle(FileHandlerData data)
         {

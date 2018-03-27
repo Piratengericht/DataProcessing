@@ -21,8 +21,11 @@ namespace Otrs2Alfresco
         private Dictionary<string, string> _replaces;
         private Dictionary<string, byte[]> _files;
 
+        public string ErrorText { get; private set; }
+
         public Latex(string text)
         {
+            ErrorText = string.Empty;
             _text = text;
             _replaces = new Dictionary<string, string>();
             _files = new Dictionary<string, byte[]>();
@@ -147,8 +150,8 @@ namespace Otrs2Alfresco
                 var start = new ProcessStartInfo(Binaries.Xelatex, documentName);
                 start.UseShellExecute = false;
                 start.WorkingDirectory = tempFolder;
-                start.RedirectStandardError = false;
-                start.RedirectStandardOutput = false;
+                start.RedirectStandardError = true;
+                start.RedirectStandardOutput = true;
 
                 var process = Process.Start(start);
 
@@ -157,11 +160,13 @@ namespace Otrs2Alfresco
                 if (!process.HasExited)
                 {
                     process.Kill();
+                    ErrorText = process.StandardOutput.ReadToEnd() + "\n" + process.StandardError.ReadToEnd();
                     return null;
                 }
 
                 if (process.ExitCode != 0)
                 {
+                    ErrorText = process.StandardOutput.ReadToEnd() + "\n" + process.StandardError.ReadToEnd();
                     return null;
                 }
 

@@ -11,6 +11,7 @@ namespace Otrs2Alfresco
 {
     public class Case
     {
+        private Logger _log;
         private OtrsClient _otrs;
         private Alfresco.AlfrescoClient _alfresco;
         private Config _config;
@@ -20,12 +21,14 @@ namespace Otrs2Alfresco
         private List<Node> _nodesInCaseFolder;
 
         public Case(
+            Logger log,
             OtrsClient otrs,
             AlfrescoClient alfresco,
             Config config,
             Ticket ticket,
             Node alfrescoLibraryNode)
         {
+            _log = log;
             _otrs = otrs;
             _alfresco = alfresco;
             _config = config;
@@ -44,7 +47,7 @@ namespace Otrs2Alfresco
             if (!FileExists(prefix + " "))
             {
                 var name = prefix + " " + Helper.SanatizeName(article.Subject);
-                Console.WriteLine("Uploading file " + name);
+                _log.Notice("Uploading file {0}", name);
                 var text = System.IO.File.ReadAllText("Templates/mail.tex");
                 var latex = new Latex(text);
                 latex.Add("MAILDATE", Helper.FormatDateTime(article.CreateTime));
@@ -62,7 +65,7 @@ namespace Otrs2Alfresco
                 }
                 else
                 {
-                    Console.WriteLine("Article could not be texed " + name);
+                    _log.Error("Article could not be texed {0}", name);
                     _alfresco.CreateFile(_caseFolder.Id, name + ".tex", Encoding.UTF8.GetBytes(latex.TexDocument));
                 }
             }
@@ -79,7 +82,7 @@ namespace Otrs2Alfresco
         private void UploadAttachement(Article article, Attachement attachement, string prefix, int number)
         {
             string attachmentPrefix = prefix + "." + string.Format("{0:00}", number);
-            var handlers = new FileHandlers(_alfresco, _otrs, _config, new FileHandlerContext(_ticket, article, _caseFolder, _nodesInCaseFolder));
+            var handlers = new FileHandlers(_alfresco, _otrs, _config, new FileHandlerContext(_log, _ticket, article, _caseFolder, _nodesInCaseFolder));
             handlers.Handle(
                 new FileHandlerData(
                     attachement.Filename,
@@ -122,7 +125,7 @@ namespace Otrs2Alfresco
 
         public void Sync()
         {
-            Console.WriteLine("Checking ticket {0}", _ticket.Number);
+            _log.Info("Checking ticket {0}", _ticket.Number);
 
             _caseFolder = _alfresco.GetNodes(_alfrescoLibraryNode.Id)
                                    .Where(n => n.Name == CaseName)
@@ -130,7 +133,7 @@ namespace Otrs2Alfresco
 
             if (_caseFolder == null)
             {
-                Console.WriteLine("Creating folder " + CaseName);
+                _log.Info("Creating folder {0}", CaseName);
                 _caseFolder = _alfresco.CreateFolder(_alfrescoLibraryNode.Id, CaseName);
             }
 

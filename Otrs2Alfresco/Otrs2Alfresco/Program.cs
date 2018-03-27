@@ -6,30 +6,16 @@ namespace Otrs2Alfresco
 {
     public static class MainClass
     {
-        private static void CheckPrerequisites()
-        {
-            foreach (var binary in Binaries.All)
-            {
-                if (File.Exists(binary))
-                {
-                    Console.WriteLine("{0} : found", binary);
-                }
-                else
-                { 
-                    Console.WriteLine("{0} : missing", binary);
-                }
-            }
-        }
-
         private static void RunSync()
         { 
             var cases = new Cases();
+            cases.CheckPrerequisites();
             cases.Connect();
             cases.FullSync();
 
             while (true)
             {
-                for (int i = 0; i < 10; i++)
+                for (int i = 0; i < 60; i++)
                 {
                     Thread.Sleep(1000);
                 }
@@ -50,9 +36,6 @@ namespace Otrs2Alfresco
             {
                 case "run":
                     RunSync();
-                    break;
-                case "prerequisites":
-                    CheckPrerequisites();
                     break;
             }
         }

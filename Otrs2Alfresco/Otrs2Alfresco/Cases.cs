@@ -11,6 +11,7 @@ namespace Otrs2Alfresco
 {
     public class Cases
     {
+        private Logger _log;
         private Config _config;
         private AlfrescoClient _alfresco;
         private OtrsClient _otrs;
@@ -18,6 +19,7 @@ namespace Otrs2Alfresco
 
         public Cases()
         {
+            _log = new Logger();
         }
 
         private IEnumerable<string> ConfigPaths
@@ -38,6 +40,7 @@ namespace Otrs2Alfresco
             {
                 if (File.Exists(path))
                 {
+                    _log.Info("Loading config file {0}", path);
                     return Config.Load(path);
                 }
             }
@@ -50,11 +53,11 @@ namespace Otrs2Alfresco
                 {
                     var config = new Config();
                     config.Save(path);
-                    throw new IOException("No config file found");
+                    throw _log.Critical("No config file cound. Created at {0}", path);
                 }
             }
 
-            throw new IOException("No valid config path found");
+            throw _log.Critical("No valid config path found");
         }
 
         public void Connect()
@@ -62,10 +65,10 @@ namespace Otrs2Alfresco
             _config = LoadConfig();
 
             _otrs = new OtrsClient(_config.OtrsBaseUrl, _config.OtrsUsername, _config.OtrsPassword);
-            Console.WriteLine("OTRS URL is " + _config.OtrsBaseUrl);
+            _log.Info("OTRS URL is {0}", _config.OtrsBaseUrl);
 
             _alfresco = new AlfrescoClient(_config.AlfrescoBaseUrl, _config.AlfrescoUsername, _config.AlfrescoPassword);
-            Console.WriteLine("Alfresco URL is " + _config.AlfrescoBaseUrl);
+            _log.Info("Alfresco URL is {0}", _config.AlfrescoBaseUrl);
         }
 
         private bool IsCase(Ticket ticket)
@@ -81,7 +84,7 @@ namespace Otrs2Alfresco
             }
 
             _lastUpdate = new DateTime(2000, 1, 1);
-            Console.WriteLine("Full sync");
+            _log.Info("Full sync");
 
             var library = _alfresco.GetNode("Sites", _config.AlfrescoSitename, "documentLibrary");
 
@@ -91,11 +94,11 @@ namespace Otrs2Alfresco
             foreach (var ticketId in ticketIds)
             {
                 var ticket = _otrs.GetTicket(ticketId);
-                Console.WriteLine("Checking ticket {0} / {1}: {2}", ticketCounter, ticketIds.Count, ticket.Number);
+                _log.Info("Checking ticket {0} / {1}: {2}", ticketCounter, ticketIds.Count, ticket.Number);
 
                 if (IsCase(ticket))
                 {
-                    var c = new Case(_otrs, _alfresco, _config, ticket, library);
+                    var c = new Case(_log, _otrs, _alfresco, _config, ticket, library);
                     c.Sync();
                 }
 
@@ -108,6 +111,21 @@ namespace Otrs2Alfresco
             }
         }
 
+        public void CheckPrerequisites()
+        {
+            foreach (var binary in Binaries.All)
+            {
+                if (File.Exists(binary))
+                {
+                    _log.Verbose("Prerequisite {0} : found", binary);
+                }
+                else
+                {
+                    _log.Warning("Prerequisite {0} : missing", binary);
+                }
+            }
+        }
+
         public void IncrementalSync()
         {
             if (_config == null || _otrs == null || _alfresco == null)
@@ -115,7 +133,7 @@ namespace Otrs2Alfresco
                 throw new InvalidOperationException("Not ready");
             }
 
-            Console.WriteLine("Incremental sync");
+            _log.Info("Incremental sync");
 
             var library = _alfresco.GetNode("Sites", _config.AlfrescoSitename, "documentLibrary");
 
@@ -125,11 +143,11 @@ namespace Otrs2Alfresco
             foreach (var ticketId in ticketIds)
             {
                 var ticket = _otrs.GetTicket(ticketId);
-                Console.WriteLine("Checking ticket {0} / {1}: {2}", ticketCounter, ticketIds.Count, ticket.Number);
+                _log.Info("Checking ticket {0} / {1}: {2}", ticketCounter, ticketIds.Count, ticket.Number);
 
                 if (IsCase(ticket))
                 {
-                    var c = new Case(_otrs, _alfresco, _config, ticket, library);
+                    var c = new Case(_log, _otrs, _alfresco, _config, ticket, library);
                     c.Sync();
                 }
 

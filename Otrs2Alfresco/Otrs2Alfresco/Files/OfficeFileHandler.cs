@@ -34,13 +34,14 @@ namespace Otrs2Alfresco
 
         public override bool Handle(FileHandlerData data)
         {
-            Console.WriteLine("Converting office file " + data.FileName);
+            Context.Log.Info("Converting office file {0}", data.FileName);
 
             using (var office = new Office())
             {
                 if (!office.Convert(data.Data, Path.GetExtension(data.FileName)))
                 {
-                    Console.WriteLine("Cannot convert file " + data.FileName);
+                    Context.Log.Error("Cannot convert file {0}", data.FileName);
+                    Context.Log.Error(office.ErrorText);
                     return false;
                 }
 

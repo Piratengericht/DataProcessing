@@ -41,13 +41,14 @@ namespace Otrs2Alfresco
 
         public override bool Handle(FileHandlerData data)
         {
-            Console.WriteLine("Extracting file " + data.FileName);
+            Context.Log.Info("Extracting file {0}", data.FileName);
 
             using (var tar = new Tar())
             {
                 if (!tar.Extract(data.Data, GetExtension(data.FileName)))
                 {
-                    Console.WriteLine("Cannot extract file " + data.FileName);
+                    Context.Log.Error("Cannot extract file {0}", data.FileName);
+                    Context.Log.Error(tar.ErrorText);
                     return false;
                 }
 

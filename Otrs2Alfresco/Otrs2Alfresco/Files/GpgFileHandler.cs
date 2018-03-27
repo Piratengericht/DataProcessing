@@ -28,13 +28,14 @@ namespace Otrs2Alfresco
 
         public override bool Handle(FileHandlerData data)
         {
-            Console.WriteLine("GPG decypting file " + data.FileName);
+            Context.Log.Info("GPG decypting file {0}", data.FileName);
 
             using (var gpg = new Gpg())
             {
                 if (!gpg.Decrypt(data.Data))
                 {
-                    Console.WriteLine("Cannot decrypt file " + data.FileName);
+                    Context.Log.Info("Cannot decrypt file {0}", data.FileName);
+                    Context.Log.Error(gpg.ErrorText);
                     return false;
                 }
 

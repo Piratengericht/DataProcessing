@@ -11,8 +11,11 @@ namespace Otrs2Alfresco
         private const string DataFile = "data.gz";
         private string _tempFolder;
 
+        public string ErrorText { get; private set; }
+
         public Gzip()
         {
+            ErrorText = string.Empty;
             _tempFolder = Path.Combine("/tmp/gzip", DateTime.Now.Ticks.ToString());
 
             if (!Directory.Exists(_tempFolder))
@@ -44,6 +47,7 @@ namespace Otrs2Alfresco
             }
             else
             {
+                ErrorText = process.StandardOutput.ReadToEnd() + "\n" + process.StandardError.ReadToEnd();
                 return false;
             }
         }

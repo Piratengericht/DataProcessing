@@ -45,7 +45,7 @@ namespace Otrs2Alfresco
 
         protected void Upload(string name, byte[] pdf)
         {
-            Console.WriteLine("Uploading file " + name);
+            Context.Log.Notice("Uploading file {0}", name);
             Alfresco.CreateFile(Context.CaseFolder.Id, name, pdf);
         }
 	}

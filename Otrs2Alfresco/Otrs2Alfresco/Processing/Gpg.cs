@@ -12,8 +12,11 @@ namespace Otrs2Alfresco
         private const string DataFilePlain = "data";
         private string _tempFolder;
 
+        public string ErrorText { get; private set; }
+
         public Gpg()
         {
+            ErrorText = string.Empty;
             _tempFolder = Path.Combine("/tmp/gpg", DateTime.Now.Ticks.ToString());
 
             if (!Directory.Exists(_tempFolder))
@@ -51,6 +54,7 @@ namespace Otrs2Alfresco
             }
             else
             {
+                ErrorText = process.StandardOutput.ReadToEnd() + "\n" + process.StandardError.ReadToEnd();
                 return false;
             }
         }

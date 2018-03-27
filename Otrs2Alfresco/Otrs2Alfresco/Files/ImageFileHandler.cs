@@ -31,7 +31,7 @@ namespace Otrs2Alfresco
 
         public override bool Handle(FileHandlerData data)
         {
-            Console.WriteLine("Converting image file " + data.FileName);
+            Context.Log.Info("Converting image file {0}", data.FileName);
             var name = data.Prefix + " " + Helper.SanatizeName(data.FileName) + ".pdf";
             var text = System.IO.File.ReadAllText("Templates/gfx.tex");
             var latex = new Latex(text);
@@ -46,7 +46,8 @@ namespace Otrs2Alfresco
             }
             else
             {
-                Console.WriteLine("Image could not be texed " + name);
+                Context.Log.Error("Image could not be texed {0}", name);
+                Context.Log.Error(latex.ErrorText);
                 Handlers.Handle(new FileHandlerData(name + ".tex", data.Prefix, data.Date, Encoding.UTF8.GetBytes(latex.TexDocument)));
             }
 

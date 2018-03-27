@@ -56,7 +56,7 @@ namespace Otrs2Alfresco
         public override bool Handle(FileHandlerData data)
         {
             // Do nothing with that file.
-            Console.WriteLine("Ignoring file " + data.FileName);
+            Context.Log.Info("Ignoring file {0}", data.FileName);
             return true;
         }
     }
