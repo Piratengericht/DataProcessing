@@ -1,0 +1,34 @@
+﻿\documentclass{scrartcl}
+\usepackage{fullpage}
+\usepackage{hyperref}
+\usepackage{calc}
+\usepackage{scrbase}
+\usepackage[parfill]{parskip}
+\usepackage{fontspec}
+\usepackage{xltxtra}
+\usepackage{xunicode}
+    
+\setromanfont[
+    BoldFont=Aller Bold
+]{Aller Light}
+\setsansfont[
+    BoldFont=Aller Bold
+]{Aller Light}
+
+\KOMAoptions{fontsize=11pt}
+
+\begin{document}
+
+\begin{tabbing}
+\hspace{3cm} \= \\
+Datum: \> MAILDATE \\
+Von: \> MAILFROM \\
+An: \> MAILTO \\
+CC: \> MAILCC \\
+Betreff: \> MAILSUBJECT \\
+Anhänge: \> MAILATTACHMENTS \\
+\end{tabbing}
+
+MAILBODY
+
+\end{document}

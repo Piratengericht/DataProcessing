@@ -1,0 +1,152 @@
+﻿using System;
+using System.Text;
+using System.Linq;
+using System.Collections.Generic;
+using System.IO;
+using System.Text.RegularExpressions;
+using Otrs;
+using Alfresco;
+
+namespace Otrs2Alfresco
+{
+    public class Case
+    {
+        private OtrsClient _otrs;
+        private Alfresco.AlfrescoClient _alfresco;
+        private Config _config;
+        private Ticket _ticket;
+        private Node _alfrescoLibraryNode;
+        private Node _caseFolder;
+        private List<Node> _nodesInCaseFolder;
+
+        public Case(
+            OtrsClient otrs,
+            AlfrescoClient alfresco,
+            Config config,
+            Ticket ticket,
+            Node alfrescoLibraryNode)
+        {
+            _otrs = otrs;
+            _alfresco = alfresco;
+            _config = config;
+            _ticket = ticket;
+            _alfrescoLibraryNode = alfrescoLibraryNode;
+        }
+
+        private bool FileExists(string prefix)
+        {
+            return _nodesInCaseFolder
+                .Any(file => file.Name.StartsWith(prefix));
+        }
+
+        private void UploadArticle(Article article, string prefix)
+        {
+            if (!FileExists(prefix + " "))
+            {
+                var name = prefix + " " + Helper.SanatizeName(article.Subject);
+                Console.WriteLine("Uploading file " + name);
+                var text = System.IO.File.ReadAllText("Templates/mail.tex");
+                var latex = new Latex(text);
+                latex.Add("MAILDATE", Helper.FormatDateTime(article.CreateTime));
+                latex.Add("MAILFROM", article.From ?? string.Empty);
+                latex.Add("MAILTO", article.To ?? string.Empty);
+                latex.Add("MAILCC", article.CC ?? string.Empty);
+                latex.Add("MAILSUBJECT", article.Subject ?? string.Empty);
+                latex.Add("MAILATTACHMENTS", string.Join(" \\\\\n \\> ", article.Attachements.Select(a => a.Filename).ToArray()), LatexEscapeMode.Minimal);
+                latex.Add("MAILBODY", article.Body, LatexEscapeMode.MultiLine);
+                var pdf = latex.Compile();
+
+                if (pdf != null)
+                {
+                    _alfresco.CreateFile(_caseFolder.Id, name, pdf);
+                }
+                else
+                {
+                    Console.WriteLine("Article could not be texed " + name);
+                    _alfresco.CreateFile(_caseFolder.Id, name + ".tex", Encoding.UTF8.GetBytes(latex.TexDocument));
+                }
+            }
+
+            int attachementNumber = 1;
+
+            foreach (var attachement in article.Attachements)
+            {
+                UploadAttachement(article, attachement, prefix, attachementNumber);
+                attachementNumber++;
+            }
+        }
+
+        private void UploadAttachement(Article article, Attachement attachement, string prefix, int number)
+        {
+            string attachmentPrefix = prefix + "." + string.Format("{0:00}", number);
+            var handlers = new FileHandlers(_alfresco, _otrs, _config, new FileHandlerContext(_ticket, article, _caseFolder, _nodesInCaseFolder));
+            handlers.Handle(
+                new FileHandlerData(
+                    attachement.Filename,
+                    attachmentPrefix, 
+                    article.CreateTime,
+                    Convert.FromBase64String(attachement.Content)));
+        }
+
+        private object[] GetGroups(Match match)
+        {
+            var values = new List<object>();
+
+            for (int i = 1; i < match.Length; i++)
+            {
+                var value = match.Groups[i].Value;
+                int number = 0;
+
+                if (int.TryParse(value, out number))
+                {
+                    values.Add(number);
+                }
+                else
+                {
+                    values.Add(value);
+                }
+            }
+
+            return values.ToArray();
+        }
+
+        private string CaseName
+        {
+            get
+            {
+                return _config.TicketPrefix +
+                              Regex.Replace(_ticket.Number, _config.TicketNumberRegex,
+                                            m => string.Format(_config.TicketNumberFormat, GetGroups(m)));
+            }
+        }
+
+        public void Sync()
+        {
+            Console.WriteLine("Checking ticket {0}", _ticket.Number);
+
+            _caseFolder = _alfresco.GetNodes(_alfrescoLibraryNode.Id)
+                                   .Where(n => n.Name == CaseName)
+                                   .SingleOrDefault();
+
+            if (_caseFolder == null)
+            {
+                Console.WriteLine("Creating folder " + CaseName);
+                _caseFolder = _alfresco.CreateFolder(_alfrescoLibraryNode.Id, CaseName);
+            }
+
+            _nodesInCaseFolder = _alfresco.GetNodes(_caseFolder.Id).ToList();
+
+            var documents = _alfresco.GetNodes(_caseFolder.Id);
+
+            foreach (var article in _ticket.Articles)
+            {
+                var prefix = string.Format("{0:000}", article.Number);
+
+                if (!documents.Any(d => d.Name.StartsWith(prefix)))
+                {
+                    UploadArticle(article, prefix);
+                }
+            }
+        }
+    }
+}

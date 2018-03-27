@@ -1,0 +1,34 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlfrescoLib", "AlfrescoLib\AlfrescoLib.csproj", "{BFD96E6A-2FB4-470A-A77B-E5659C8D13EF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlfrescoCli", "AlfrescoCli\AlfrescoCli.csproj", "{320DF820-2164-45FB-918C-BBB07B5DB41B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BFD96E6A-2FB4-470A-A77B-E5659C8D13EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BFD96E6A-2FB4-470A-A77B-E5659C8D13EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BFD96E6A-2FB4-470A-A77B-E5659C8D13EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BFD96E6A-2FB4-470A-A77B-E5659C8D13EF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{320DF820-2164-45FB-918C-BBB07B5DB41B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{320DF820-2164-45FB-918C-BBB07B5DB41B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{320DF820-2164-45FB-918C-BBB07B5DB41B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{320DF820-2164-45FB-918C-BBB07B5DB41B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		Policies = $0
+		$0.DotNetNamingPolicy = $1
+		$1.DirectoryNamespaceAssociation = PrefixedHierarchical
+		$0.TextStylePolicy = $2
+		$2.FileWidth = 80
+		$2.TabsToSpaces = True
+		$2.scope = text/x-csharp
+		$0.CSharpFormattingPolicy = $3
+		$3.scope = text/x-csharp
+	EndGlobalSection
+EndGlobal
