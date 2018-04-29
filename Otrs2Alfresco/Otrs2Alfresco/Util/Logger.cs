@@ -136,7 +136,7 @@ namespace Otrs2Alfresco
 
         private IEnumerable<LogEntry> Write(LogSeverity severity, string text, object[] arguments)
         {
-            var fullText = string.Format(text, arguments);
+            var fullText = arguments.Length > 0 ? string.Format(text, arguments) : text;
 
             foreach (var line in fullText.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries))
             {

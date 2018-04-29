@@ -145,7 +145,7 @@ namespace Otrs2Alfresco
             {
                 var prefix = string.Format("{0:000}", article.Number);
 
-                if (!documents.Any(d => d.Name.StartsWith(prefix)))
+                if (!FileExists(prefix))
                 {
                     UploadArticle(article, prefix);
                 }
