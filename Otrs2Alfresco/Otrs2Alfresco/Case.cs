@@ -66,6 +66,7 @@ namespace Otrs2Alfresco
                 else
                 {
                     _log.Error("Article could not be texed {0}", name);
+                    _log.Error(latex.ErrorText);
                     _alfresco.CreateFile(_caseFolder.Id, name + ".tex", Encoding.UTF8.GetBytes(latex.TexDocument));
                 }
             }
