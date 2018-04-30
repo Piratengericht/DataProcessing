@@ -47,7 +47,7 @@ namespace Otrs2Alfresco
             if (!FileExists(prefix + " "))
             {
                 var name = prefix + " " + Helper.SanatizeName(article.Subject);
-                _log.Notice("Uploading file {0}", name);
+                _log.Info("Handling file {0}", name);
                 var text = System.IO.File.ReadAllText("Templates/mail.tex");
                 var latex = new Latex(text);
                 latex.Add("MAILDATE", Helper.FormatDateTime(article.CreateTime));
@@ -61,12 +61,14 @@ namespace Otrs2Alfresco
 
                 if (pdf != null)
                 {
+                    _log.Notice("Uploading file {0}", name);
                     _alfresco.CreateFile(_caseFolder.Id, name, pdf);
                 }
                 else
                 {
                     _log.Error("Article could not be texed {0}", name);
                     _log.Error(latex.ErrorText);
+                    _log.Notice("Uploading file {0}", name + ".tex");
                     _alfresco.CreateFile(_caseFolder.Id, name + ".tex", Encoding.UTF8.GetBytes(latex.TexDocument));
                 }
             }
@@ -83,13 +85,18 @@ namespace Otrs2Alfresco
         private void UploadAttachement(Article article, Attachement attachement, string prefix, int number)
         {
             string attachmentPrefix = prefix + "." + string.Format("{0:00}", number);
-            var handlers = new FileHandlers(_alfresco, _otrs, _config, new FileHandlerContext(_log, _ticket, article, _caseFolder, _nodesInCaseFolder));
-            handlers.Handle(
-                new FileHandlerData(
-                    attachement.Filename,
-                    attachmentPrefix, 
-                    article.CreateTime,
-                    Convert.FromBase64String(attachement.Content)));
+
+            if (!FileExists(attachmentPrefix + " "))
+            {
+                _log.Info("Handling file {0} {1}", attachmentPrefix, attachement.Filename);
+                var handlers = new FileHandlers(_alfresco, _otrs, _config, new FileHandlerContext(_log, _ticket, article, _caseFolder, _nodesInCaseFolder));
+                handlers.Handle(
+                    new FileHandlerData(
+                        attachement.Filename,
+                        attachmentPrefix,
+                        article.CreateTime,
+                        Convert.FromBase64String(attachement.Content)));
+            }
         }
 
         private object[] GetGroups(Match match)
@@ -140,16 +147,17 @@ namespace Otrs2Alfresco
 
             _nodesInCaseFolder = _alfresco.GetNodes(_caseFolder.Id).ToList();
 
+            foreach (var node in _nodesInCaseFolder)
+            {
+                Console.WriteLine(node.Name);
+            }
+
             var documents = _alfresco.GetNodes(_caseFolder.Id);
 
             foreach (var article in _ticket.Articles)
             {
                 var prefix = string.Format("{0:000}", article.Number);
-
-                if (!FileExists(prefix))
-                {
-                    UploadArticle(article, prefix);
-                }
+                UploadArticle(article, prefix);
             }
         }
     }
