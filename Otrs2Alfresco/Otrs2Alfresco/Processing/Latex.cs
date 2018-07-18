@@ -102,8 +102,8 @@ namespace Otrs2Alfresco
                        .Replace(@"&", @"\&")
                        .Replace("\"", @"\textquotedbl{}");
 
-            text = Regex.Replace(text, @"^\[(.*)\](.*)$", "{[$1]}$2");
-            text = Regex.Replace(text, @"^\[(.*)$", "{[}$1");
+            text = Regex.Replace(text, @"^\[(.*)\](.*)$", "{[$1]}$2", RegexOptions.Multiline);
+            text = Regex.Replace(text, @"^\[(.*)$", "{[}$1", RegexOptions.Multiline);
 
             return SanatizeLatex(text);
         }
