@@ -27,10 +27,8 @@ namespace Otrs2Alfresco
         {
             get
             {
-                yield return "/mnt/sdb/Security/PPS/O2A.config.xml";
-                yield return "/Security/PPS/O2A.config.xml";
-                //yield return "/mnt/sdb/Security/PPDE/O2A.config.xml";
-                //yield return "/Security/PPDE/O2A.config.xml";
+                //yield return "/Security/PPS/O2A.config.xml";
+                yield return "/Security/PPDE/O2A.config.xml";
                 yield return Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "config.xml");
             }
         }

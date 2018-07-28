@@ -12,9 +12,23 @@ namespace Otrs2Alfresco
 
         public static string SanatizeName(string input)
         {
-            return input.Replace("*", ".")
+            input = input.Trim();
+
+            input = input.Replace("*", ".")
                 .Replace("/", ".")
                 .Replace(":", ".");
+
+            if (input.EndsWith(".", StringComparison.InvariantCulture))
+            {
+                input = input.Substring(0, input.Length - 1);
+            }
+
+            if (input == string.Empty)
+            {   
+                input = "_";
+            }
+
+            return input;
         }
     }
 }

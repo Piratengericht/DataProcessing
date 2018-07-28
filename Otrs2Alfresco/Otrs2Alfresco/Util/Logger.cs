@@ -20,9 +20,9 @@ namespace Otrs2Alfresco
 
     public class LogEntry
     {
-        public LogSeverity Severity { get;  private set; }
+        public LogSeverity Severity { get; private set; }
 
-        public string Text { get; private set;  }
+        public string Text { get; private set; }
 
         public DateTime DateTime { get; private set; }
 
@@ -35,9 +35,9 @@ namespace Otrs2Alfresco
 
         public string ToText()
         {
-            return string.Format("{0} {1} {2}", 
-                                 DateTime.ToString("yyyy-MM-dd-HH-mm-ss", CultureInfo.InvariantCulture).PadRight(20), 
-                                 Severity.ToString().PadRight(8), 
+            return string.Format("{0} {1} {2}",
+                                 DateTime.ToString("yyyy-MM-dd-HH-mm-ss", CultureInfo.InvariantCulture).PadRight(20),
+                                 Severity.ToString().PadRight(8),
                                  Text);
         }
     }
@@ -56,7 +56,8 @@ namespace Otrs2Alfresco
 
         private DateTime _logFileDate;
 
-        private const string LogPath = "/var/log/o2a";
+        private const string LogPath = "o2a.log";
+        //private const string LogPath = "/var/log/o2a";
 
         public Logger()
         {

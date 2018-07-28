@@ -39,7 +39,7 @@ namespace Otrs2Alfresco
         private bool FileExists(string prefix)
         {
             return _nodesInCaseFolder
-                .Any(file => file.Name.StartsWith(prefix));
+                .Any(file => file.Name.StartsWith(prefix, StringComparison.InvariantCulture));
         }
 
         private void UploadArticle(Article article, string prefix)
