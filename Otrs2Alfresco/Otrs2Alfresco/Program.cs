@@ -15,7 +15,7 @@ namespace Otrs2Alfresco
 
             while (true)
             {
-                for (int i = 0; i < 60; i++)
+                for (int i = 0; i < 600; i++)
                 {
                     Thread.Sleep(1000);
                 }
