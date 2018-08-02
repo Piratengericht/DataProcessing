@@ -88,7 +88,7 @@ namespace Otrs2Alfresco
             config.MailServerPort = int.Parse(root.Element(MailServerPortTag).Value);
             config.SystemMailAddress = root.Element(SystemMailAddressTag).Value;
 
-            return config;§
+            return config;
         }
 
         public void Save(string filename)

@@ -51,6 +51,30 @@
     <Reference Include="MailKit">
       <HintPath>..\packages\MailKit.2.0.3\lib\net45\MailKit.dll</HintPath>
     </Reference>
+    <Reference Include="mscorlib">
+      <HintPath>..\..\..\..\usr\lib\mono\4.5-api\mscorlib.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Core">
+      <HintPath>..\..\..\..\usr\lib\mono\4.5-api\System.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="System">
+      <HintPath>..\..\..\..\usr\lib\mono\4.5-api\System.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http">
+      <HintPath>..\..\..\..\usr\lib\mono\4.5-api\System.Net.Http.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data">
+      <HintPath>..\..\..\..\usr\lib\mono\4.5-api\System.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security">
+      <HintPath>..\..\..\..\usr\lib\mono\4.5-api\System.Security.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml">
+      <HintPath>..\..\..\..\usr\lib\mono\4.5-api\System.Xml.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq">
+      <HintPath>..\..\..\..\usr\lib\mono\4.5-api\System.Xml.Linq.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
@@ -85,6 +109,7 @@
     <Compile Include="Files\FileHandlerData.cs" />
     <Compile Include="Util\Logger.cs" />
     <Compile Include="Util\Mailer.cs" />
+    <Compile Include="Util\StringExtension.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Alfresco\AlfrescoLib\AlfrescoLib.csproj">

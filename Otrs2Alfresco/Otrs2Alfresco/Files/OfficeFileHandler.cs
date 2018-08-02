@@ -22,14 +22,14 @@ namespace Otrs2Alfresco
         public override bool CanHandle(FileHandlerData data)
         {
             return
-                data.FileName.EndsWith (".doc") ||
-                data.FileName.EndsWith (".docx") ||
-                data.FileName.EndsWith (".xls") ||
-                data.FileName.EndsWith (".xlsx") ||
-                data.FileName.EndsWith (".odt") ||
-                data.FileName.EndsWith (".ods") ||
-                data.FileName.EndsWith (".odg") ||
-                data.FileName.EndsWith (".odp");
+                data.FileName.EndsWith (".doc", StringComparison.InvariantCulture) ||
+                data.FileName.EndsWith (".docx", StringComparison.InvariantCulture) ||
+                data.FileName.EndsWith (".xls", StringComparison.InvariantCulture) ||
+                data.FileName.EndsWith (".xlsx", StringComparison.InvariantCulture) ||
+                data.FileName.EndsWith (".odt", StringComparison.InvariantCulture) ||
+                data.FileName.EndsWith (".ods", StringComparison.InvariantCulture) ||
+                data.FileName.EndsWith (".odg", StringComparison.InvariantCulture) ||
+                data.FileName.EndsWith (".odp", StringComparison.InvariantCulture);
         }
 
         public override bool Handle(FileHandlerData data)

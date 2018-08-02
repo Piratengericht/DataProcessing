@@ -166,31 +166,5 @@ namespace Otrs
 
             return JObject.Parse(response.Content.ReadAsStringAsync().Result);
         }
-
-        public void X()
-        {
-            //var creds = "UserLogin=exception&Password=SECRET";
-            var otrs = "https://otrs.piratengericht.ch/otrs";
-            //var uri = otrs + "/nph-genericinterface.pl/Webservice/REST/TicketSearch?" + creds;
-            //var uri = otrs + "/nph-genericinterface.pl/Webservice/REST/TicketGet/373?" + creds;
-            //var uri = otrs + "/nph-genericinterface.pl/Webservice/REST/TicketHistoryGet/373?" + creds;
-            var uri = otrs + "/nph-genericinterface.pl/Webservice/REST/TicketGetAll";
-
-            var user = new JProperty("UserLogin", new JValue("exception"));
-            var pass = new JProperty("Password", new JValue("SECRET"));
-            var id = new JProperty("TicketID", new JValue("55"));
-            var all = new JProperty("AllArticles", new JValue("1"));
-            var att = new JProperty("Attachments", new JValue("1"));
-            var props = new JObject(user, pass, id, all, att);
-            //var data = new JProperty("TicketGet", props);
-
-            var request = new HttpRequestMessage(HttpMethod.Put, uri);
-            request.Content = new StringContent(props.ToString());
-            var client = new HttpClient();
-            var response = client.SendAsync(request).Result;
-            Console.WriteLine(response.StatusCode);
-            var r = JObject.Parse(response.Content.ReadAsStringAsync().Result);
-            Console.WriteLine(r.ToString());
-        }
     }
 }

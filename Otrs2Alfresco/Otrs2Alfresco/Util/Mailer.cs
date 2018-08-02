@@ -42,6 +42,7 @@ namespace Otrs2Alfresco
             try
             {
                 var client = new SmtpClient();
+                client.SslProtocols = System.Security.Authentication.SslProtocols.None;
                 client.Connect(_config.MailServerHost, _config.MailServerPort);
                 _log.Verbose("Connected to mail server {0}:{1}", _config.MailServerHost, _config.MailServerPort);
 

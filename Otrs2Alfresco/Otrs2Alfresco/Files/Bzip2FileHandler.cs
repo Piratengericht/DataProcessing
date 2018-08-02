@@ -22,7 +22,7 @@ namespace Otrs2Alfresco
         public override bool CanHandle(FileHandlerData data)
         {
             return
-                data.FileName.EndsWith (".bz2");
+                data.FileName.EndsWith (".bz2", StringComparison.InvariantCulture);
         }
 
         public override bool Handle(FileHandlerData data)

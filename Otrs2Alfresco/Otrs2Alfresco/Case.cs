@@ -46,16 +46,16 @@ namespace Otrs2Alfresco
         {
             if (!FileExists(prefix + " "))
             {
-                var name = prefix + " " + Helper.SanatizeName(article.Subject);
+                var name = Helper.CreateName(prefix, article.Subject, "pdf");
                 _log.Notice("Uploading file {0}", name);
                 var text = System.IO.File.ReadAllText("Templates/mail.tex");
                 var latex = new Latex(text);
                 latex.Add("MAILDATE", Helper.FormatDateTime(article.CreateTime));
-                latex.Add("MAILFROM", article.From ?? string.Empty);
-                latex.Add("MAILTO", article.To ?? string.Empty);
-                latex.Add("MAILCC", article.CC ?? string.Empty);
+                latex.Add("MAILFROM", article.From ?? string.Empty, LatexEscapeMode.Minimal);
+                latex.Add("MAILTO", Latex.TableMultiline(article.To ?? string.Empty), LatexEscapeMode.Minimal);
+                latex.Add("MAILCC", Latex.TableMultiline(article.CC ?? string.Empty), LatexEscapeMode.Minimal);
                 latex.Add("MAILSUBJECT", article.Subject ?? string.Empty);
-                latex.Add("MAILATTACHMENTS", string.Join(" \\\\\n \\> ", article.Attachements.Select(a => a.Filename).ToArray()), LatexEscapeMode.Minimal);
+                latex.Add("MAILATTACHMENTS", Latex.TableMultiline(article.Attachements.Select(a => a.Filename)), LatexEscapeMode.Minimal);
                 latex.Add("MAILBODY", article.Body, LatexEscapeMode.MultiLine);
                 var pdf = latex.Compile();
 
@@ -126,7 +126,7 @@ namespace Otrs2Alfresco
 
         public void Sync()
         {
-            _log.Info("Checking ticket {0}", _ticket.Number);
+            _log.Info("Checking case {0}", _ticket.Number);
 
             _caseFolder = _alfresco.GetNodes(_alfrescoLibraryNode.Id)
                                    .Where(n => n.Name == CaseName)
@@ -139,8 +139,6 @@ namespace Otrs2Alfresco
             }
 
             _nodesInCaseFolder = _alfresco.GetNodes(_caseFolder.Id).ToList();
-
-            var documents = _alfresco.GetNodes(_caseFolder.Id);
 
             foreach (var article in _ticket.Articles)
             {

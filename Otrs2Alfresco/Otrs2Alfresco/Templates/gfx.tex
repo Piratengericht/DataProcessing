@@ -15,16 +15,20 @@
     BoldFont=Aller Bold
 ]{Aller Light}
 
+\setlength{\tabcolsep}{0cm}
+\renewcommand{\arraystretch}{1.2}
+\setlength{\intextsep}{0cm}
+
 \KOMAoptions{fontsize=11pt}
 
 \begin{document}
 
-\begin{tabbing}
-\hspace{3cm} \= \\
-Dokument: \> GFXDOCUMENT \\
-Datum: \> GFXDATE \\
-\end{tabbing}
+\begin{tabular}{ @{} p{0.15\textwidth} p{0.85\textwidth} @{} }
+Dokument:   & GFXDOCUMENT \\
+Datum:      & GFXDATE \\
+\end{tabular}
 
+\vspace{0.5cm}
 \includegraphics[width=\textwidth]{GFXIMAGE}
 
 \end{document}

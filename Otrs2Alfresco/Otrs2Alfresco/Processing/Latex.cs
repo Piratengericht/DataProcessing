@@ -5,6 +5,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace Otrs2Alfresco
 {
@@ -22,6 +23,16 @@ namespace Otrs2Alfresco
         private Dictionary<string, byte[]> _files;
 
         public string ErrorText { get; private set; }
+
+        public static string TableMultiline(string values)
+        {
+            return TableMultiline(values.Split(new string[] { "; ", ", " }, StringSplitOptions.RemoveEmptyEntries));
+        }
+
+        public static string TableMultiline(IEnumerable<string> values)
+        {
+            return string.Join(@"\newline{}", values.ToArray());
+        }
 
         public Latex(string text)
         {
@@ -102,8 +113,9 @@ namespace Otrs2Alfresco
                        .Replace(@"&", @"\&")
                        .Replace("\"", @"\textquotedbl{}");
 
-            text = Regex.Replace(text, @"^\[(.*)\](.*)$", "{[$1]}$2");
-            text = Regex.Replace(text, @"^\[(.*)$", "{[}$1");
+            text = Regex.Replace(text, @"^ *?\[(.*?)\]$", "{[$1]}", RegexOptions.Multiline);
+            text = Regex.Replace(text, @"^ *?\[(.*?)\](.*)$", "{[$1]}$2", RegexOptions.Multiline);
+            text = Regex.Replace(text, @"^ *?\[(.*)$", "{[}$1", RegexOptions.Multiline);
 
             return SanatizeLatex(text);
         }
@@ -157,8 +169,19 @@ namespace Otrs2Alfresco
                 start.RedirectStandardOutput = true;
 
                 var process = Process.Start(start);
+                var startTime = DateTime.Now;
 
-                process.WaitForExit(10000);
+                while (!process.HasExited)
+                {
+                    if (DateTime.Now.Subtract(startTime).TotalSeconds > 10d)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        Thread.Sleep(100);
+                    }
+                }
 
                 if (!process.HasExited)
                 {

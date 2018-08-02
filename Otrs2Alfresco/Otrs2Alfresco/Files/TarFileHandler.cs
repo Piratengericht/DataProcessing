@@ -31,12 +31,12 @@ namespace Otrs2Alfresco
 
         public override bool CanHandle(FileHandlerData data)
         {
-            return Extensions.Any(e => data.FileName.EndsWith(e));
+            return Extensions.Any(e => data.FileName.EndsWith(e, StringComparison.InvariantCulture));
         }
 
         private string GetExtension(string fileName)
         {
-            return Extensions.Where(e => fileName.EndsWith(e)).Single();
+            return Extensions.Where(e => fileName.EndsWith(e, StringComparison.InvariantCulture)).Single();
         }
 
         public override bool Handle(FileHandlerData data)

@@ -28,7 +28,7 @@ namespace Otrs2Alfresco
         {
             if (!FileExists(data.Prefix + " "))
             {
-                var name = data.Prefix + " " + Helper.SanatizeName(data.FileName);
+                var name = Helper.CreateName(data.Prefix, data.FileName, string.Empty);
                 Upload(name, data.Data);
             }
 
