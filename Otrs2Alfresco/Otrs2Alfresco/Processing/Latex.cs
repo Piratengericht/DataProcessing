@@ -77,15 +77,13 @@ namespace Otrs2Alfresco
 
         private string ConvertParagraph(string text)
         {
+            IEnumerable<string> lines = text.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries);
+
             var builder = new StringBuilder();
-
-            foreach (var line in text.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries))
+            foreach (var line in lines)
             {
-                var trimmed = line.Trim();
-
-                builder.AppendLine(trimmed + @" \\");
+                builder.AppendLine(line + @"\\");
             }
-
             return builder.ToString();
         }
 
@@ -114,8 +112,8 @@ namespace Otrs2Alfresco
                        .Replace("\"", @"\textquotedbl{}");
 
             text = Regex.Replace(text, @"^ *?\[(.*?)\]$", "{[$1]}", RegexOptions.Multiline);
-            text = Regex.Replace(text, @"^\[(.*)\](.*)$", "{[$1]}$2");
-            text = Regex.Replace(text, @"^\[(.*)$", "{[}$1");
+            text = Regex.Replace(text, @"^ *\[(.*)\](.*)$", "{[$1]}$2", RegexOptions.Multiline);
+            text = Regex.Replace(text, @"^ *\[(.*)$", "{[}$1", RegexOptions.Multiline);
 
             return SanatizeLatex(text);
         }
