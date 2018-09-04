@@ -41,29 +41,33 @@ namespace Otrs2Alfresco
         }
 
         private void HandleMessage(MimeMessage message, string prefix)
-        { 
-            var name = Helper.CreateName(prefix, message.Subject, "pdf");
-            Context.Log.Info("Uploading file {0}", name);
-            var text = System.IO.File.ReadAllText("Templates/mail.tex");
-            var latex = new Latex(text);
-            latex.Add("MAILDATE", Helper.FormatDateTime(message.Date.Date));
-            latex.Add("MAILFROM", ToString(message.From));
-            latex.Add("MAILTO", ToString(message.To), LatexEscapeMode.Minimal);
-            latex.Add("MAILCC", ToString(message.Cc), LatexEscapeMode.Minimal);
-            latex.Add("MAILSUBJECT", message.Subject);
-            latex.Add("MAILATTACHMENTS", Latex.TableMultiline(GetAttachementNames(message)), LatexEscapeMode.Minimal);
-            latex.Add("MAILBODY", message.TextBody ?? message.Body.ToString(), LatexEscapeMode.MultiLine);
-            var pdf = latex.Compile();
-        
-            if (pdf != null)
+        {
+            if (!FileExists(prefix + " "))
             {
-                Target.CreateFile(name, pdf);
-            }
-            else
-            {
-                Context.Log.Error("Eml could not be texed {0}", name);
-                Context.Log.Error(latex.ErrorText);
-                Target.CreateFile(name + ".tex", Encoding.UTF8.GetBytes(latex.TexDocument));
+                var name = Helper.CreateName(prefix, message.Subject, "pdf");
+                var text = System.IO.File.ReadAllText("Templates/mail.tex");
+                var latex = new Latex(text);
+                latex.Add("MAILDATE", Helper.FormatDateTime(message.Date.Date));
+                latex.Add("MAILFROM", ToString(message.From));
+                latex.Add("MAILTO", ToString(message.To), LatexEscapeMode.Minimal);
+                latex.Add("MAILCC", ToString(message.Cc), LatexEscapeMode.Minimal);
+                latex.Add("MAILSUBJECT", message.Subject);
+                latex.Add("MAILATTACHMENTS", Latex.TableMultiline(GetAttachementNames(message)), LatexEscapeMode.Minimal);
+                latex.Add("MAILBODY", message.TextBody ?? message.Body.ToString(), LatexEscapeMode.MultiLine);
+                var pdf = latex.Compile();
+
+                if (pdf != null)
+                {
+                    Context.Log.Notice("Uploading file {0}", name);
+	                Target.CreateFile(name, pdf);
+                }
+                else
+                {
+                    Context.Log.Error("Eml could not be texed {0}", name);
+                    Context.Log.Error(latex.ErrorText);
+                    Context.Log.Notice("Uploading file {0}", name + ".tex");
+    	            Target.CreateFile(name + ".tex", Encoding.UTF8.GetBytes(latex.TexDocument));
+                }
             }
         }
 

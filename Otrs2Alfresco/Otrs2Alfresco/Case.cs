@@ -36,7 +36,6 @@ namespace Otrs2Alfresco
             if (!_targetCase.FileExists(prefix + " "))
             {
                 var name = Helper.CreateName(prefix, article.Subject, "pdf");
-                _log.Info("Handling file {0}", name);
                 var text = System.IO.File.ReadAllText("Templates/mail.tex");
                 var latex = new Latex(text);
                 latex.Add("MAILDATE", Helper.FormatDateTime(article.CreateTime));
@@ -77,7 +76,6 @@ namespace Otrs2Alfresco
 
             if (!_targetCase.FileExists(attachmentPrefix + " "))
             {
-                _log.Info("Handling file {0} {1}", attachmentPrefix, attachement.Filename);
                 var handlers = new FileHandlers(_otrs, _targetCase, _config, new FileHandlerContext(_log, _ticket, article));
                 handlers.Handle(
                     new FileHandlerData(
