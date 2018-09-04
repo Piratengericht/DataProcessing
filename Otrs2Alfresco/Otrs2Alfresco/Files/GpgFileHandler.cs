@@ -22,8 +22,8 @@ namespace Otrs2Alfresco
         public override bool CanHandle(FileHandlerData data)
         {
             return
-                data.FileName.EndsWith(".gpg") ||
-                data.FileName.EndsWith(".asc");
+                data.FileName.EndsWith(".gpg", StringComparison.InvariantCulture) ||
+                data.FileName.EndsWith(".asc", StringComparison.InvariantCulture);
         }
 
         public override bool Handle(FileHandlerData data)

@@ -24,26 +24,34 @@ namespace Otrs2Alfresco
         public override bool CanHandle(FileHandlerData data)
         {
             return
-                data.FileName.EndsWith(".eml");
+                data.FileName.EndsWith(".eml", StringComparison.InvariantCulture);
         }
 
         private string ToString(InternetAddressList addresses)
         {
-            return string.Join("; ", addresses.Select(a => a.ToString()).ToString());
+            return Latex.TableMultiline(addresses.Select(a => a.ToString()));
+        }
+
+        private static IEnumerable<string> GetAttachementNames(MimeMessage message)
+        {
+            foreach (MimePart attachment in message.Attachments)
+            {
+                yield return attachment.FileName;
+            }
         }
 
         private void HandleMessage(MimeMessage message, string prefix)
         { 
-            var name = prefix + " " + Helper.SanatizeName(message.Subject);
+            var name = Helper.CreateName(prefix, message.Subject, "pdf");
             Context.Log.Info("Uploading file {0}", name);
             var text = System.IO.File.ReadAllText("Templates/mail.tex");
             var latex = new Latex(text);
             latex.Add("MAILDATE", Helper.FormatDateTime(message.Date.Date));
             latex.Add("MAILFROM", ToString(message.From));
-            latex.Add("MAILTO", ToString(message.To));
-            latex.Add("MAILCC", ToString(message.Cc));
+            latex.Add("MAILTO", ToString(message.To), LatexEscapeMode.Minimal);
+            latex.Add("MAILCC", ToString(message.Cc), LatexEscapeMode.Minimal);
             latex.Add("MAILSUBJECT", message.Subject);
-            latex.Add("MAILATTACHMENTS", string.Join(" \\\\\n \\> ", message.Attachments.Select(a => a.ContentId).ToArray()), LatexEscapeMode.Minimal);
+            latex.Add("MAILATTACHMENTS", Latex.TableMultiline(GetAttachementNames(message)), LatexEscapeMode.Minimal);
             latex.Add("MAILBODY", message.TextBody ?? message.Body.ToString(), LatexEscapeMode.MultiLine);
             var pdf = latex.Compile();
         
@@ -67,11 +75,11 @@ namespace Otrs2Alfresco
                 HandleMessage(message, data.Prefix);
                 var counter = 1;
 
-                foreach (var attachement in message.Attachments)
+                foreach (MimePart attachement in message.Attachments)
                 {
                     using (var file = new MemoryStream())
                     {
-                        attachement.WriteTo(file, true);
+                        attachement.Content.DecodeTo(file);
                         Handlers.Handle(
                             new FileHandlerData(
                                 attachement.ContentDisposition.FileName,

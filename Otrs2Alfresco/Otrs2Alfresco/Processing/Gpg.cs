@@ -3,6 +3,7 @@ using System.IO;
 using System.Diagnostics;
 using System.Linq;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace Otrs2Alfresco
 {
@@ -38,8 +39,19 @@ namespace Otrs2Alfresco
             start.RedirectStandardOutput = true;
 
             var process = Process.Start(start);
+            var startTime = DateTime.Now;
 
-            process.WaitForExit(2000);
+            while (!process.HasExited)
+            {
+                if (DateTime.Now.Subtract(startTime).TotalSeconds > 2d)
+                {
+                    break;
+                }
+                else
+                {
+                    Thread.Sleep(100);
+                }
+            }
 
             if (!process.HasExited)
             {
