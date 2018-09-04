@@ -12,12 +12,12 @@ namespace Otrs2Alfresco
     public class EmlFileHandler : FileHandler
     {
         public EmlFileHandler(
-            AlfrescoClient alfresco,
             OtrsClient otrs,
+            ITargetCase target,
             Config config,
             FileHandlers handlers,
             FileHandlerContext context)
-            : base(alfresco, otrs, config, handlers, context)
+            : base(otrs, target, config, handlers, context)
         {
         }
 
@@ -49,13 +49,13 @@ namespace Otrs2Alfresco
         
             if (pdf != null)
             {
-                Alfresco.CreateFile(Context.CaseFolder.Id, name, pdf);
+                Target.CreateFile(name, pdf);
             }
             else
             {
                 Context.Log.Error("Eml could not be texed {0}", name);
                 Context.Log.Error(latex.ErrorText);
-                Alfresco.CreateFile(Context.CaseFolder.Id, name + ".tex", Encoding.UTF8.GetBytes(latex.TexDocument));
+                Target.CreateFile(name + ".tex", Encoding.UTF8.GetBytes(latex.TexDocument));
             }
         }
 

@@ -85,6 +85,10 @@
     <Compile Include="Files\FileHandlerData.cs" />
     <Compile Include="Util\Logger.cs" />
     <Compile Include="Util\Mailer.cs" />
+    <Compile Include="TargetApi\TargetApi.cs" />
+    <Compile Include="TargetApi\AlfescoApi.cs" />
+    <Compile Include="Controller.cs" />
+    <Compile Include="TargetApi\FsApi.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Alfresco\AlfrescoLib\AlfrescoLib.csproj">
@@ -114,5 +118,6 @@
     <Folder Include="Files\" />
     <Folder Include="Util\" />
     <Folder Include="Templates\" />
+    <Folder Include="TargetApi\" />
   </ItemGroup>
 </Project>

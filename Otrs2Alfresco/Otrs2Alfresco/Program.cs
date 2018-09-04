@@ -7,10 +7,12 @@ namespace Otrs2Alfresco
     public static class MainClass
     {
         private static void RunSync()
-        { 
-            var cases = new Cases();
-            cases.CheckPrerequisites();
-            cases.Connect();
+        {
+            var controller = new Controller();
+            controller.CheckPrerequisites();
+            controller.Connect();
+
+            var cases = controller.CreateCases();
             cases.FullSync();
 
             while (true)

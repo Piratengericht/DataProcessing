@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using Otrs;
-using Alfresco;
 
 namespace Otrs2Alfresco
 {
@@ -13,38 +12,28 @@ namespace Otrs2Alfresco
     {
         private Logger _log;
         private OtrsClient _otrs;
-        private Alfresco.AlfrescoClient _alfresco;
+        private ITargetApi _target;
+        private ITargetCase _targetCase;
         private Config _config;
         private Ticket _ticket;
-        private Node _alfrescoLibraryNode;
-        private Node _caseFolder;
-        private List<Node> _nodesInCaseFolder;
 
         public Case(
             Logger log,
             OtrsClient otrs,
-            AlfrescoClient alfresco,
+            ITargetApi target,
             Config config,
-            Ticket ticket,
-            Node alfrescoLibraryNode)
+            Ticket ticket)
         {
             _log = log;
             _otrs = otrs;
-            _alfresco = alfresco;
+            _target = target;
             _config = config;
             _ticket = ticket;
-            _alfrescoLibraryNode = alfrescoLibraryNode;
-        }
-
-        private bool FileExists(string prefix)
-        {
-            return _nodesInCaseFolder
-                .Any(file => file.Name.StartsWith(prefix));
         }
 
         private void UploadArticle(Article article, string prefix)
         {
-            if (!FileExists(prefix + " "))
+            if (!_targetCase.FileExists(prefix + " "))
             {
                 var name = prefix + " " + Helper.SanatizeName(article.Subject);
                 _log.Info("Handling file {0}", name);
@@ -62,14 +51,14 @@ namespace Otrs2Alfresco
                 if (pdf != null)
                 {
                     _log.Notice("Uploading file {0}", name);
-                    _alfresco.CreateFile(_caseFolder.Id, name, pdf);
+                    _targetCase.CreateFile(name, pdf);
                 }
                 else
                 {
                     _log.Error("Article could not be texed {0}", name);
                     _log.Error(latex.ErrorText);
                     _log.Notice("Uploading file {0}", name + ".tex");
-                    _alfresco.CreateFile(_caseFolder.Id, name + ".tex", Encoding.UTF8.GetBytes(latex.TexDocument));
+                    _targetCase.CreateFile(name + ".tex", Encoding.UTF8.GetBytes(latex.TexDocument));
                 }
             }
 
@@ -86,10 +75,10 @@ namespace Otrs2Alfresco
         {
             string attachmentPrefix = prefix + "." + string.Format("{0:00}", number);
 
-            if (!FileExists(attachmentPrefix + " "))
+            if (!_targetCase.FileExists(attachmentPrefix + " "))
             {
                 _log.Info("Handling file {0} {1}", attachmentPrefix, attachement.Filename);
-                var handlers = new FileHandlers(_alfresco, _otrs, _config, new FileHandlerContext(_log, _ticket, article, _caseFolder, _nodesInCaseFolder));
+                var handlers = new FileHandlers(_otrs, _targetCase, _config, new FileHandlerContext(_log, _ticket, article));
                 handlers.Handle(
                     new FileHandlerData(
                         attachement.Filename,
@@ -135,24 +124,7 @@ namespace Otrs2Alfresco
         {
             _log.Info("Checking ticket {0}", _ticket.Number);
 
-            _caseFolder = _alfresco.GetNodes(_alfrescoLibraryNode.Id)
-                                   .Where(n => n.Name == CaseName)
-                                   .SingleOrDefault();
-
-            if (_caseFolder == null)
-            {
-                _log.Info("Creating folder {0}", CaseName);
-                _caseFolder = _alfresco.CreateFolder(_alfrescoLibraryNode.Id, CaseName);
-            }
-
-            _nodesInCaseFolder = _alfresco.GetNodes(_caseFolder.Id).ToList();
-
-            foreach (var node in _nodesInCaseFolder)
-            {
-                Console.WriteLine(node.Name);
-            }
-
-            var documents = _alfresco.GetNodes(_caseFolder.Id);
+            _targetCase = _target.OpenOrCreateCase(CaseName);
 
             foreach (var article in _ticket.Articles)
             {

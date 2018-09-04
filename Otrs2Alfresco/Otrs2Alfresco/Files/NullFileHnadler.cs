@@ -11,12 +11,12 @@ namespace Otrs2Alfresco
     public class NullFileHandler : FileHandler
     {
         public NullFileHandler(
-            AlfrescoClient alfresco,
             OtrsClient otrs,
+            ITargetCase target,
             Config config,
             FileHandlers handlers,
             FileHandlerContext context)
-            : base(alfresco, otrs, config, handlers, context)
+            : base(otrs, target, config, handlers, context)
         {
         }
 

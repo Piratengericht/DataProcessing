@@ -3,13 +3,21 @@ using System.Xml.Linq;
 
 namespace Otrs2Alfresco
 {
+    public enum TargetApiType
+    {
+        FileSystem,
+        Alfresco,
+    }
+
     public class Config
     {
         private const string ConfigTag = "Config";
+        private const string TargetApiTypeTag = "TargetApiType";
         private const string AlfrescoBaseUrlTag = "AlfrescoBaseUrl";
         private const string AlfrescoUsernameTag = "AlfrescoUsername";
         private const string AlfrescoPasswordTag = "AlfrescoPassword";
         private const string AlfrescoSitenameTag = "AlfrescoSitename";
+        private const string FileSystemPathTag = "FileSystemPath";
         private const string OtrsBaseUrlTag = "OtrsBaseUrl";
         private const string OtrsUsernameTag = "OtrsUsername";
         private const string OtrsPasswordTag = "OtrsPassword";
@@ -21,6 +29,8 @@ namespace Otrs2Alfresco
         private const string MailServerPortTag = "MailServerPort";
         private const string SystemMailAddressTag = "SystemMailAddress";
 
+        public TargetApiType TargetApiType { get; private set; }
+
         public string AlfrescoBaseUrl { get; private set; }
 
         public string AlfrescoUsername { get; private set; }
@@ -28,6 +38,8 @@ namespace Otrs2Alfresco
         public string AlfrescoPassword { get; private set; }
 
         public string AlfrescoSitename { get; private set; }
+
+        public string FileSystemPath { get; private set; }
 
         public string OtrsBaseUrl { get; private set;  }
 
@@ -51,10 +63,12 @@ namespace Otrs2Alfresco
 
         public Config()
         {
+            TargetApiType = TargetApiType.FileSystem;
             AlfrescoBaseUrl = string.Empty;
             AlfrescoUsername = string.Empty;
             AlfrescoPassword = string.Empty;
             AlfrescoSitename = string.Empty;
+            FileSystemPath = string.Empty;
             OtrsBaseUrl = string.Empty;
             OtrsUsername = string.Empty;
             OtrsPassword = string.Empty;
@@ -73,10 +87,23 @@ namespace Otrs2Alfresco
             var document = XDocument.Load(filename);
             var root = document.Root;
 
-            config.AlfrescoBaseUrl = root.Element(AlfrescoBaseUrlTag).Value;
-            config.AlfrescoUsername = root.Element(AlfrescoUsernameTag).Value;
-            config.AlfrescoPassword = root.Element(AlfrescoPasswordTag).Value;
-            config.AlfrescoSitename = root.Element(AlfrescoSitenameTag).Value;
+            config.TargetApiType = (TargetApiType)Enum.Parse(typeof(TargetApiType), root.Element(TargetApiTypeTag).Value);
+
+            switch (config.TargetApiType)
+            {
+                case TargetApiType.FileSystem:
+                    config.FileSystemPath = root.Element(FileSystemPathTag).Value;
+                    break;
+                case TargetApiType.Alfresco:
+                    config.AlfrescoBaseUrl = root.Element(AlfrescoBaseUrlTag).Value;
+                    config.AlfrescoUsername = root.Element(AlfrescoUsernameTag).Value;
+                    config.AlfrescoPassword = root.Element(AlfrescoPasswordTag).Value;
+                    config.AlfrescoSitename = root.Element(AlfrescoSitenameTag).Value;
+                    break;
+                default:
+                    throw new InvalidOperationException();
+            }
+
             config.OtrsBaseUrl = root.Element(OtrsBaseUrlTag).Value;
             config.OtrsUsername = root.Element(OtrsUsernameTag).Value;
             config.OtrsPassword = root.Element(OtrsPasswordTag).Value;
@@ -97,10 +124,23 @@ namespace Otrs2Alfresco
             var root = new XElement(ConfigTag);
             document.Add(root);
 
-            root.Add(new XElement(AlfrescoBaseUrlTag, AlfrescoBaseUrl));
-            root.Add(new XElement(AlfrescoUsernameTag, AlfrescoUsername));
-            root.Add(new XElement(AlfrescoPasswordTag, AlfrescoPassword));
-            root.Add(new XElement(AlfrescoSitenameTag, AlfrescoSitename));
+            root.Add(new XElement(TargetApiTypeTag, TargetApiType.ToString()));
+
+            switch (TargetApiType)
+            {
+                case TargetApiType.FileSystem:
+                    root.Add(new XElement(FileSystemPathTag, FileSystemPath));
+                    break;
+                case TargetApiType.Alfresco:
+                    root.Add(new XElement(AlfrescoBaseUrlTag, AlfrescoBaseUrl));
+                    root.Add(new XElement(AlfrescoUsernameTag, AlfrescoUsername));
+                    root.Add(new XElement(AlfrescoPasswordTag, AlfrescoPassword));
+                    root.Add(new XElement(AlfrescoSitenameTag, AlfrescoSitename));
+                    break;
+                default:
+                    throw new InvalidOperationException();
+            }
+
             root.Add(new XElement(OtrsBaseUrlTag, OtrsBaseUrl));
             root.Add(new XElement(OtrsUsernameTag, OtrsUsername));
             root.Add(new XElement(OtrsPasswordTag, OtrsPassword));

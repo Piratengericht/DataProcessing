@@ -15,22 +15,14 @@ namespace Otrs2Alfresco
 
         public Article Article { get; private set; }
 
-        public Node CaseFolder { get; private set; }
-
-        public List<Node> NodesInCaseFolder { get; private set; }
-
         public FileHandlerContext(
             Logger log,
             Ticket ticket,
-            Article article,
-            Node caseFolder,
-            List<Node> nodesInCaseFolder)
+            Article article)
         {
             Log = log;
             Ticket = ticket;
             Article = article;
-            CaseFolder = caseFolder;
-            NodesInCaseFolder = nodesInCaseFolder;
         }
     }
 }

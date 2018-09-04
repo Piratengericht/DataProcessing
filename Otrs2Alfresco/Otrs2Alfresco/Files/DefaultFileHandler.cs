@@ -10,12 +10,12 @@ namespace Otrs2Alfresco
     public class DefaultFileHandler : FileHandler
     {
         public DefaultFileHandler(
-            AlfrescoClient alfresco,
             OtrsClient otrs,
+            ITargetCase target,
             Config config,
             FileHandlers handlers,
             FileHandlerContext context)
-            : base(alfresco, otrs, config, handlers, context)
+            : base(otrs, target, config, handlers, context)
         {
         }
 
@@ -26,7 +26,7 @@ namespace Otrs2Alfresco
 
         public override bool Handle(FileHandlerData data)
         {
-            if (!FileExists(data.Prefix + " "))
+            if (!Target.FileExists(data.Prefix + " "))
             {
                 var name = data.Prefix + " " + Helper.SanatizeName(data.FileName);
                 Upload(name, data.Data);

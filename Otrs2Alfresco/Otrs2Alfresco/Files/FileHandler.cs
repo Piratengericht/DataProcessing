@@ -9,9 +9,9 @@ namespace Otrs2Alfresco
 {
     public abstract class FileHandler
 	{
-        protected AlfrescoClient Alfresco { get; private set; }
-
         protected OtrsClient Otrs { get; private set; }
+
+        protected ITargetCase Target { get; private set; }
 
         protected Config Config { get; private set; }
 
@@ -20,14 +20,14 @@ namespace Otrs2Alfresco
         protected FileHandlerContext Context { get; private set; }
 
 		public FileHandler(
-            AlfrescoClient alfresco,
             OtrsClient otrs,
+            ITargetCase target,
             Config config,
             FileHandlers handlers,
             FileHandlerContext context)
 		{
-            Alfresco = alfresco;
             Otrs = otrs;
+            Target = target;
             Config = config;
             Handlers = handlers;
             Context = context;
@@ -37,16 +37,10 @@ namespace Otrs2Alfresco
 
         public abstract bool Handle(FileHandlerData data);
 
-        protected bool FileExists(string prefix)
-        {
-            return Context.NodesInCaseFolder
-                .Any(file => file.Name.StartsWith(prefix));
-        }
-
         protected void Upload(string name, byte[] pdf)
         {
             Context.Log.Notice("Uploading file {0}", name);
-            Alfresco.CreateFile(Context.CaseFolder.Id, name, pdf);
+            Target.CreateFile(name, pdf);
         }
 	}
 }

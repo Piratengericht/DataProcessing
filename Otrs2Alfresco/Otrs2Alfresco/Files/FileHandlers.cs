@@ -12,22 +12,22 @@ namespace Otrs2Alfresco
         private List<FileHandler> _handlers;
 
         public FileHandlers(
-            AlfrescoClient alfresco,
             OtrsClient otrs,
+            ITargetCase target,
             Config config,
             FileHandlerContext context)
         {
             _handlers = new List<FileHandler>();
-            _handlers.Add(new NullFileHandler(alfresco, otrs, config, this, context));
-            _handlers.Add(new GpgFileHandler(alfresco, otrs, config, this, context));
-            _handlers.Add(new TarFileHandler(alfresco, otrs, config, this, context));
-            _handlers.Add(new ZipFileHandler(alfresco, otrs, config, this, context));
-            _handlers.Add(new GzipFileHandler(alfresco, otrs, config, this, context));
-            _handlers.Add(new Bzip2FileHandler(alfresco, otrs, config, this, context));
-            _handlers.Add(new EmlFileHandler(alfresco, otrs, config, this, context));
-            _handlers.Add(new ImageFileHandler(alfresco, otrs, config, this, context));
-            _handlers.Add(new OfficeFileHandler(alfresco, otrs, config, this, context));
-            _handlers.Add(new DefaultFileHandler(alfresco, otrs, config, this, context));
+            _handlers.Add(new NullFileHandler(otrs, target, config, this, context));
+            _handlers.Add(new GpgFileHandler(otrs, target, config, this, context));
+            _handlers.Add(new TarFileHandler(otrs, target, config, this, context));
+            _handlers.Add(new ZipFileHandler(otrs, target, config, this, context));
+            _handlers.Add(new GzipFileHandler(otrs, target, config, this, context));
+            _handlers.Add(new Bzip2FileHandler(otrs, target, config, this, context));
+            _handlers.Add(new EmlFileHandler(otrs, target, config, this, context));
+            _handlers.Add(new ImageFileHandler(otrs, target, config, this, context));
+            _handlers.Add(new OfficeFileHandler(otrs, target, config, this, context));
+            _handlers.Add(new DefaultFileHandler(otrs, target, config, this, context));
         }
 
         public void Handle(FileHandlerData data)
