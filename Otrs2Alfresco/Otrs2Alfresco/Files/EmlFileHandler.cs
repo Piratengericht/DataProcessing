@@ -42,7 +42,7 @@ namespace Otrs2Alfresco
 
         private void HandleMessage(MimeMessage message, string prefix)
         {
-            if (!FileExists(prefix + " "))
+            if (!Target.FileExists(prefix + " "))
             {
                 var name = Helper.CreateName(prefix, message.Subject, "pdf");
                 var text = System.IO.File.ReadAllText("Templates/mail.tex");
