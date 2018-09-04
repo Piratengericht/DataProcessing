@@ -23,16 +23,16 @@ namespace Otrs2Alfresco
         public override bool CanHandle(FileHandlerData data)
         {
             return
-                data.FileName.EndsWith(".jpg") ||
-                data.FileName.EndsWith(".jpeg") ||
-                data.FileName.EndsWith(".png") ||
-                data.FileName.EndsWith(".bmp");
+                data.FileName.EndsWith(".jpg", StringComparison.InvariantCulture) ||
+                data.FileName.EndsWith(".jpeg", StringComparison.InvariantCulture) ||
+                data.FileName.EndsWith(".png", StringComparison.InvariantCulture) ||
+                data.FileName.EndsWith(".bmp", StringComparison.InvariantCulture);
         }
 
         public override bool Handle(FileHandlerData data)
         {
             Context.Log.Info("Converting image file {0}", data.FileName);
-            var name = data.Prefix + " " + Helper.SanatizeName(data.FileName) + ".pdf";
+            var name = Helper.CreateName(data.Prefix, data.FileName, "pdf");
             var text = System.IO.File.ReadAllText("Templates/gfx.tex");
             var latex = new Latex(text);
             latex.Add("GFXDOCUMENT", data.FileName);

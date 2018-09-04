@@ -23,14 +23,14 @@ namespace Otrs2Alfresco
         public override bool CanHandle(FileHandlerData data)
         {
             return
-                data.FileName.EndsWith(".txt");
+                data.FileName.EndsWith(".txt", StringComparison.InvariantCulture);
         }
 
         public override bool Handle(FileHandlerData data)
         {
             Context.Log.Info("Converting text file {0}", data.FileName);
             var textdata = TextEncoding.AutoConvertTextData(data.Data);
-            var name = data.Prefix + " " + Helper.SanatizeName(data.FileName) + ".pdf";
+            var name = Helper.CreateName(data.Prefix, data.FileName, "pdf");
             var text = System.IO.File.ReadAllText("Templates/text.tex");
             var latex = new Latex(text);
             latex.Add("TEXTDOCUMENT", data.FileName);
