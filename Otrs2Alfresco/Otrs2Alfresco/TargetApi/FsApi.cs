@@ -43,13 +43,17 @@ namespace Otrs2Alfresco
 
         public ITargetCase OpenOrCreateCase(string caseName)
         {
-            var caseDir = Path.Combine(_path, caseName);
-
-            if (!Directory.Exists(caseDir))
+            var root = new DirectoryInfo(_path);
+            foreach (var dir in root.GetDirectories("*", SearchOption.AllDirectories))
             {
-                Directory.CreateDirectory(caseDir);
+                if (Path.GetFileName(dir.FullName) == caseName)
+                {
+                    return new FsCase(_log, _config, dir.FullName);
+                }
             }
 
+            var caseDir = Path.Combine(_path, caseName);
+            Directory.CreateDirectory(caseDir);
             return new FsCase(_log, _config, caseDir);
         }
     }
