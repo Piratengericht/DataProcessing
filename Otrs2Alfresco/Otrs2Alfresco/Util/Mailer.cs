@@ -37,6 +37,7 @@ namespace Otrs2Alfresco
 
         public void Send(string to, string subject, string body)
         {
+            return;
             _log.Verbose("Sending message to {0}", to);
 
             try
