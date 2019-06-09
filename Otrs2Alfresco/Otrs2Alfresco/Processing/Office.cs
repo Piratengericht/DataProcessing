@@ -31,7 +31,7 @@ namespace Otrs2Alfresco
 
             File.WriteAllBytes(dataPath, data);
 
-            var start = new ProcessStartInfo(Binaries.Soffice, "pdf " + DataFile + suffix);
+            var start = new ProcessStartInfo(Binaries.Soffice, "--headless --convert-to pdf " + DataFile + suffix);
             start.UseShellExecute = false;
             start.WorkingDirectory = _tempFolder;
             start.RedirectStandardError = true;
@@ -42,7 +42,7 @@ namespace Otrs2Alfresco
 
             while (!process.HasExited)
             {
-                if (DateTime.Now.Subtract(startTime).TotalSeconds > 10d)
+                if (DateTime.Now.Subtract(startTime).TotalSeconds > 30d)
                 {
                     break;
                 }
@@ -52,6 +52,12 @@ namespace Otrs2Alfresco
                 }
             }
 
+            if (!process.HasExited)
+            {
+                process.Kill();
+                ErrorText = process.StandardOutput.ReadToEnd() + "\n" + process.StandardError.ReadToEnd();
+                return false;
+            }
 
             if (process.ExitCode == 0)
             {
