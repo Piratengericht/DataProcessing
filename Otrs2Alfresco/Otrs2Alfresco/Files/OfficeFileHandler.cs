@@ -47,7 +47,7 @@ namespace Otrs2Alfresco
 
                 foreach (var file in office.Files)
                 {
-                    var newFileName = Path.GetFileName(file);
+                    var newFileName = data.FileName + ".pdf";
                     var newData = File.ReadAllBytes(file);
                     Handlers.Handle(new FileHandlerData(newFileName, data.Prefix, data.Date, newData));
                 }
